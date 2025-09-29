@@ -4,6 +4,6 @@ section .text
 global _start
 
 _start:
-    mov rdi, 60
-    xor rdi, rdi 
+    mov rax, 60 
+    xor rdi, 0
     syscall
