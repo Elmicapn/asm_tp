@@ -5,14 +5,13 @@ section .text
 global _start
 
 _start:
-    mov rdi, [rsp+16]
-
-    test rdi, rdi
+    mov rsi, [rsp+16]
+    test rsi, rsi
     jz .noarg
 
     xor rcx, rcx
 .count:
-    cmp byte [rdi+rcx], 0
+    cmp byte [rsi+rcx], 0
     je .print
     inc rcx
     jmp .count
@@ -20,7 +19,6 @@ _start:
 .print:
     mov eax, 1
     mov edi, 1
-    mov rsi, rdi
     mov rdx, rcx
     syscall
 
