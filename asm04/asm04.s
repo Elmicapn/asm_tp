@@ -1,5 +1,4 @@
 section .data
-
 section .bss
 
 buf resb 32
@@ -14,7 +13,7 @@ _start:
     lea rsi,[rel buf]
     mov edx,32
     syscall
-
+    
     xor ecx,ecx
     mov rbx,buf
 
@@ -26,7 +25,18 @@ _start:
     imul ecx,ecx,10
     add ecx,eax
     inc rbx
+    jmp .next
 
 .done:
     test ecx,1
+    jnz .odd
 
+.even:
+    mov eax,60
+    xor edi,edi
+    syscall
+
+.odd:
+    mov eax,60
+    mov edi,1
+    syscall
