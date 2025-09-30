@@ -26,10 +26,7 @@ _start:
     imul ecx,ecx,10
     add ecx,eax
     inc rbx
-    jmp .next
 
 .done:
     test ecx,1
-    jnz .odd
-
 
