@@ -7,20 +7,19 @@ section .text
 
 global _start
 _start:
-    cmp rdi,2
+
+    mov rax,[rsp]
+    cmp rax,2
     jne fail
 
-    mov rbx,[rsi+8]
-    mov al,[rbx]
-    cmp al,'4'
+    mov rbx,[rsp+16]
+    cmp byte [rbx],'4'
     jne fail
 
-    mov al,[rbx+1]
-    cmp al,'2'
+    cmp byte [rbx+1],'2'
     jne fail
 
-    mov al,[rbx+2]
-    test al,al
+    cmp byte [rbx+2],0
     jne fail
 
 ok: mov eax,1
@@ -28,7 +27,7 @@ ok: mov eax,1
     mov rsi,msg
     mov edx,len
     syscall
-    
+
     mov eax,60
     xor edi,edi
     syscall
