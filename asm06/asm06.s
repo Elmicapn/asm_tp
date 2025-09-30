@@ -8,6 +8,11 @@ section .text
 global _start
 
 _start:
+
+    mov rax, [rsp]
+    cmp rax, 3
+    jb noarg
+
     mov rsi, [rsp+16]
     call atoi
     mov r8, rax
@@ -65,3 +70,8 @@ itoa:
     jnz .conv
     mov rbx, rdi
     ret
+
+noarg:
+    mov eax, 60
+    mov edi, 1
+    syscall
