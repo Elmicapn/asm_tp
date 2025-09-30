@@ -37,6 +37,12 @@ _start:
 
 atoi:
     xor rax, rax
+    xor r9, r9
+    mov bl, [rsi]
+    cmp bl, '-'
+    jne .next
+    mov r9b, 1
+    inc rsi
 
 .next:
     mov bl, [rsi]
@@ -51,11 +57,24 @@ atoi:
     jmp .next
 
 .done:
+    test r9b, r9b
+    jz .ret
+    neg rax
+
+.ret:
     ret
+
 
 itoa:
     mov rcx, 0
     mov rbx, 10
+    xor r9, r9
+    test rax, rax
+    jns .positive
+    neg rax
+    mov r9b, 1
+
+.positive:
     lea rdi, [rsi+31]
     mov byte [rdi], 0
 
@@ -68,6 +87,13 @@ itoa:
     inc rcx
     test rax, rax
     jnz .conv
+    test r9b, r9b
+    jz .done
+    dec rdi
+    mov byte [rdi], '-'
+    inc rcx
+
+.done:
     mov rbx, rdi
     ret
 
