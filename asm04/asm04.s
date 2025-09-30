@@ -1,4 +1,5 @@
 section .data
+
 section .bss
 
 buf resb 32
