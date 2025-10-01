@@ -1,5 +1,3 @@
-section .data 
-
 section .text
 
 global _start
@@ -8,10 +6,12 @@ _start:
 
     mov rax, [rsp]
     cmp rax, 2
-    jb noarg
+    jb badarg
 
     mov rsi, [rsp+16]
     call atoi
+    cmp rax, -1
+    je badinput
     mov rdi, rax
     call is_prime
 
@@ -19,19 +19,29 @@ _start:
     mov eax, 60
     syscall
 
-noarg:
+badarg:
     mov eax, 60
     mov edi, 1
     syscall
 
+badinput:
+    mov eax, 60
+    mov edi, 2
+    syscall
+
 atoi:
     xor rax, rax
+
 .next:
     mov bl, [rsi]
     cmp bl, 0
     je .done
     cmp bl, 10
     je .done
+    cmp bl, '0'
+    jb .error
+    cmp bl, '9'
+    ja .error
     sub bl, '0'
     imul eax, eax, 10
     add eax, ebx
@@ -39,6 +49,10 @@ atoi:
     jmp .next
 
 .done:
+    ret
+
+.error:
+    mov rax, -1
     ret
 
 is_prime:
@@ -49,7 +63,7 @@ is_prime:
     jz .not_prime
     mov rbx, 3
 
-.test_div:
+.loop:
     mov rax, rbx
     imul rax, rbx
     cmp rax, rdi
@@ -60,12 +74,12 @@ is_prime:
     test rdx, rdx
     jz .not_prime
     add rbx, 2
-    jmp .test_div
+    jmp .loop
 
 .prime:
     xor rax, rax
     ret
-
+    
 .not_prime:
     mov rax, 1
     ret
