@@ -1,7 +1,4 @@
-section .data
-
-section .bss
-    buffer resb 32
+section .data 
 
 section .text
 
@@ -10,40 +7,25 @@ global _start
 _start:
 
     mov rax, [rsp]
-    cmp rax, 3
+    cmp rax, 2
     jb noarg
 
     mov rsi, [rsp+16]
     call atoi
-    mov r8, rax
+    mov rdi, rax
+    call is_prime
 
-    mov rsi, [rsp+24]
-    call atoi
-    add r8, rax
-
-    mov rax, r8
-    lea rsi, [rel buffer]
-    call itoa
-
-    mov eax, 1
-    mov edi, 1
-    mov rsi, rbx
-    mov rdx, rcx
+    mov rdi, rax
+    mov eax, 60
     syscall
 
+noarg:
     mov eax, 60
-    xor edi, edi
+    mov edi, 1
     syscall
 
 atoi:
     xor rax, rax
-    xor r9, r9
-    mov bl, [rsi]
-    cmp bl, '-'
-    jne .next
-    mov r9b, 1
-    inc rsi
-
 .next:
     mov bl, [rsi]
     cmp bl, 0
@@ -57,47 +39,33 @@ atoi:
     jmp .next
 
 .done:
-    test r9b, r9b
-    jz .ret
-    neg rax
-
-.ret:
     ret
 
+is_prime:
+    cmp rdi, 2
+    jb .not_prime
+    je .prime
+    test rdi, 1
+    jz .not_prime
+    mov rbx, 3
 
-itoa:
-    mov rcx, 0
-    mov rbx, 10
-    xor r9, r9
-    test rax, rax
-    jns .positive
-    neg rax
-    mov r9b, 1
-
-.positive:
-    lea rdi, [rsi+31]
-    mov byte [rdi], 0
-
-.conv:
+.test_div:
+    mov rax, rbx
+    imul rax, rbx
+    cmp rax, rdi
+    ja .prime
+    mov rax, rdi
     xor rdx, rdx
     div rbx
-    add dl, '0'
-    dec rdi
-    mov [rdi], dl
-    inc rcx
-    test rax, rax
-    jnz .conv
-    test r9b, r9b
-    jz .done
-    dec rdi
-    mov byte [rdi], '-'
-    inc rcx
+    test rdx, rdx
+    jz .not_prime
+    add rbx, 2
+    jmp .test_div
 
-.done:
-    mov rbx, rdi
+.prime:
+    xor rax, rax
     ret
 
-noarg:
-    mov eax, 60
-    mov edi, 1
-    syscall
+.not_prime:
+    mov rax, 1
+    ret
