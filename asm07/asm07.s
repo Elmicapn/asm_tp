@@ -1,9 +1,7 @@
 section .text
-
 global _start
 
 _start:
-
     mov rax, [rsp]
     cmp rax, 2
     jb badarg
@@ -31,7 +29,6 @@ badinput:
 
 atoi:
     xor rax, rax
-
 .next:
     mov bl, [rsi]
     cmp bl, 0
@@ -43,14 +40,12 @@ atoi:
     cmp bl, '9'
     ja .error
     sub bl, '0'
-    imul eax, eax, 10
-    add eax, ebx
+    imul rax, rax, 10
+    add rax, rbx
     inc rsi
     jmp .next
-
 .done:
     ret
-
 .error:
     mov rax, -1
     ret
@@ -62,7 +57,6 @@ is_prime:
     test rdi, 1
     jz .not_prime
     mov rbx, 3
-
 .loop:
     mov rax, rbx
     imul rax, rbx
@@ -75,11 +69,9 @@ is_prime:
     jz .not_prime
     add rbx, 2
     jmp .loop
-
 .prime:
     xor rax, rax
     ret
-    
 .not_prime:
     mov rax, 1
     ret
