@@ -1,25 +1,32 @@
+section .data 
+
+section .bss
+buffer resb 32
+
 section .text
+
 global _start
 
 _start:
-    mov rax, [rsp]
-    cmp rax, 2
-    jb badarg
+    mov eax, 0
+    mov edi, 0
+    mov rsi, buffer
+    mov edx, 32
+    syscall
 
-    mov rsi, [rsp+16]
+    test rax, rax
+    jle badinput
+
+    mov rsi, buffer
     call atoi
     cmp rax, -1
     je badinput
+
     mov rdi, rax
     call is_prime
 
-    mov rdi, rax
+    mov edi, eax
     mov eax, 60
-    syscall
-
-badarg:
-    mov eax, 60
-    mov edi, 1
     syscall
 
 badinput:
@@ -29,6 +36,7 @@ badinput:
 
 atoi:
     xor rax, rax
+
 .next:
     mov bl, [rsi]
     cmp bl, 0
@@ -44,8 +52,10 @@ atoi:
     add rax, rbx
     inc rsi
     jmp .next
+
 .done:
     ret
+
 .error:
     mov rax, -1
     ret
@@ -69,9 +79,11 @@ is_prime:
     jz .not_prime
     add rbx, 2
     jmp .loop
+
 .prime:
-    xor rax, rax
+    xor eax, eax
     ret
+
 .not_prime:
-    mov rax, 1
+    mov eax, 1
     ret
