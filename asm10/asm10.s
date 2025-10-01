@@ -2,37 +2,31 @@ section .bss
     buffer resb 32
 
 section .text
-
 global _start
 
 _start:
-
     mov rax, [rsp]
     cmp rax, 4
     jb noarg
-
-    mov rcx, 1
-    mov rdx, 3
 
     mov rsi, [rsp+16]
     call atoi
     mov r8, rax
 
-.loop:
-    inc rcx
-    cmp rcx, rdx
-    jg .done_loop
-    mov rsi, [rsp+rcx*8]
+    mov rsi, [rsp+24]
     call atoi
     cmp rax, r8
-    jle .loop
-    mov r8, rax
-    jmp .loop
+    cmovg r8, rax
 
-.done_loop:
+    mov rsi, [rsp+32]
+    call atoi
+    cmp rax, r8
+    cmovg r8, rax
+
     mov rax, r8
     lea rsi, [rel buffer]
     call itoa
+
     mov eax, 1
     mov edi, 1
     mov rsi, rbx
@@ -51,7 +45,6 @@ atoi:
     jne .next
     mov r9b, 1
     inc rsi
-
 .next:
     mov bl, [rsi]
     cmp bl, 0
@@ -63,12 +56,10 @@ atoi:
     add eax, ebx
     inc rsi
     jmp .next
-
 .done:
     test r9b, r9b
     jz .ret
     neg rax
-
 .ret:
     ret
 
@@ -80,11 +71,9 @@ itoa:
     jns .positive
     neg rax
     mov r9b, 1
-
 .positive:
     lea rdi, [rsi+31]
     mov byte [rdi], 0
-
 .conv:
     xor rdx, rdx
     div rbx
@@ -99,7 +88,6 @@ itoa:
     dec rdi
     mov byte [rdi], '-'
     inc rcx
-
 .done:
     mov rbx, rdi
     ret
