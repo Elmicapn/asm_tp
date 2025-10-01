@@ -1,5 +1,3 @@
-section .data
-
 section .bss
     buffer resb 32
 
@@ -10,21 +8,31 @@ global _start
 _start:
 
     mov rax, [rsp]
-    cmp rax, 3
+    cmp rax, 4
     jb noarg
+
+    mov rcx, 1
+    mov rdx, 3
 
     mov rsi, [rsp+16]
     call atoi
     mov r8, rax
 
-    mov rsi, [rsp+24]
+.loop:
+    inc rcx
+    cmp rcx, rdx
+    jg .done_loop
+    mov rsi, [rsp+rcx*8]
     call atoi
-    add r8, rax
+    cmp rax, r8
+    jle .loop
+    mov r8, rax
+    jmp .loop
 
+.done_loop:
     mov rax, r8
     lea rsi, [rel buffer]
     call itoa
-
     mov eax, 1
     mov edi, 1
     mov rsi, rbx
@@ -63,7 +71,6 @@ atoi:
 
 .ret:
     ret
-
 
 itoa:
     mov rcx, 0
