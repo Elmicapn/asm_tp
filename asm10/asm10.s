@@ -1,7 +1,7 @@
 section .data
 
 section .bss
-    buffer resb 48
+    buffer resb 32
 
 section .text
 
@@ -18,10 +18,6 @@ _start:
     mov r8, rax
 
     mov rsi, [rsp+24]
-    call atoi
-    add r8, rax
-
-    mov rsi, [rsp+36]
     call atoi
     add r8, rax
 
