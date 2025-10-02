@@ -5,29 +5,35 @@ section .text
     global _start
 
 _start:
+    ; argc est à [rsp], argv[0] à [rsp+8], argv[1] à [rsp+16]
     mov rbx, rsp
-    mov rdi, [rbx]
+    mov rdi, [rbx]        ; argc
     cmp rdi, 2
-    jl no_param
-    mov rsi, [rbx+16]
-    call atoi
+    jl no_param           ; s'il n'y a pas de paramètre
+
+    mov rsi, [rbx+16]     ; argv[1]
+    call atoi             ; -> rax contient N
     cmp rax, -1
     je badinput
 
+    ; calcul somme = N*(N-1)/2
     mov rcx, rax
     dec rcx
     imul rax, rcx
-    shr rax, 1
+    shr rax, 1            ; division par 2
 
+    ; conversion en string
     mov rsi, outbuf
     call itoa
 
-    mov eax, 1
-    mov edi, 1
-    mov rsi, rsi       ; pointeur début string déjà dans rsi
-    mov rdx, rbx       ; *** ici on met la longueur calculée par itoa ***
+    ; write(1, rbx, rcx)
+    mov eax, 1            ; sys_write
+    mov edi, 1            ; stdout
+    mov rsi, rbx          ; adresse du buffer retournée
+    mov rdx, rcx          ; longueur
     syscall
 
+    ; exit(0)
     mov eax, 60
     xor edi, edi
     syscall
@@ -42,6 +48,10 @@ badinput:
     mov edi, 2
     syscall
 
+
+; -------- atoi --------
+; in:  rsi -> string
+; out: rax = nombre ou -1 si erreur
 atoi:
     xor rax, rax
 .next:
@@ -63,22 +73,32 @@ atoi:
     mov rax, -1
     ret
 
+
+; -------- itoa --------
+; in:  rax = valeur
+; out: rbx = adresse début string, rcx = longueur
 itoa:
-    mov rcx, 10
-    mov rbx, rsi
-    add rsi, 31
-    mov byte [rsi], 10
+    mov rdi, outbuf
+    add rdi, 31
+    mov byte [rdi], 10     ; mettre '\n'
+    mov rsi, rdi
+    mov rcx, 1
+    test rax, rax
+    jnz .loop
     dec rsi
-.conv_loop:
+    mov byte [rsi], '0'
+    inc rcx
+    jmp .finish
+.loop:
     xor rdx, rdx
-    div rcx
+    mov r8, 10
+    div r8
+    dec rsi
     add dl, '0'
     mov [rsi], dl
-    dec rsi
+    inc rcx
     test rax, rax
-    jnz .conv_loop
-    inc rsi
-    mov rdx, outbuf+32
-    sub rdx, rsi
-    mov rbx, rdx      ; => longueur totale
+    jnz .loop
+.finish:
+    mov rbx, rsi
     ret
