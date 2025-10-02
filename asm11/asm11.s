@@ -89,4 +89,15 @@ itoa:
     inc     rcx
     jmp     .finish
 
+.loop:
+    xor     rdx, rdx
+    mov     r8, 10
+    div     r8
+    dec     rsi
+    add     dl, '0'
+    test    rax, rax
+    jnz     .loop
 
+.finish:
+    mov     rbx, rsi
+    ret
