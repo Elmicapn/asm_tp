@@ -6,34 +6,28 @@ section .text
 
 _start:
     mov rbx, rsp
-    mov rdi, [rbx]            ; argc
+    mov rdi, [rbx]
     cmp rdi, 2
     jl no_param
-    mov rsi, [rbx+16]         ; argv[1]
+    mov rsi, [rbx+16]
     call atoi
     cmp rax, -1
     je badinput
 
     mov rcx, rax
-    xor rax, rax
-    mov rdx, 1
+    dec rcx
+    imul rax, rcx
+    shr rax, 1
 
-.sum_loop:
-    cmp rdx, rcx
-    jge .done_sum
-    add rax, rdx
-    inc rdx
-    jmp .sum_loop
-
-.done_sum:
     mov rsi, outbuf
     call itoa
+
     mov eax, 1
     mov edi, 1
-    mov rsi, outbuf
-    mov rdx, rbx
+    mov rsi, rsi       ; pointeur début string déjà dans rsi
+    mov rdx, rbx       ; *** ici on met la longueur calculée par itoa ***
     syscall
-    
+
     mov eax, 60
     xor edi, edi
     syscall
@@ -50,7 +44,6 @@ badinput:
 
 atoi:
     xor rax, rax
-
 .next:
     mov bl, [rsi]
     cmp bl, 0
@@ -64,10 +57,8 @@ atoi:
     add rax, rbx
     inc rsi
     jmp .next
-
 .done:
     ret
-
 .error:
     mov rax, -1
     ret
@@ -78,7 +69,6 @@ itoa:
     add rsi, 31
     mov byte [rsi], 10
     dec rsi
-
 .conv_loop:
     xor rdx, rdx
     div rcx
@@ -90,5 +80,5 @@ itoa:
     inc rsi
     mov rdx, outbuf+32
     sub rdx, rsi
-    mov rbx, rdx
+    mov rbx, rdx      ; => longueur totale
     ret
