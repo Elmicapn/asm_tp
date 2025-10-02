@@ -95,6 +95,8 @@ itoa:
     div     r8
     dec     rsi
     add     dl, '0'
+    mov     [rsi], dl
+    inc     rcx
     test    rax, rax
     jnz     .loop
 
