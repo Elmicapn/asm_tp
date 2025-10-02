@@ -5,22 +5,24 @@ section .text
     global _start
 
 _start:
-    pop rdi
-    pop rsi
-    pop rsi
+    mov rbx, rsp
+    mov rdi, [rbx]            ; argc
+    cmp rdi, 2
+    jl no_param
+    mov rsi, [rbx+16]         ; argv[1]
     call atoi
     cmp rax, -1
     je badinput
 
     mov rcx, rax
     xor rax, rax
-    mov rbx, 1
+    mov rdx, 1
 
 .sum_loop:
-    cmp rbx, rcx
+    cmp rdx, rcx
     jge .done_sum
-    add rax, rbx
-    inc rbx
+    add rax, rdx
+    inc rdx
     jmp .sum_loop
 
 .done_sum:
@@ -34,6 +36,11 @@ _start:
     
     mov eax, 60
     xor edi, edi
+    syscall
+
+no_param:
+    mov eax, 60
+    mov edi, 1
     syscall
 
 badinput:
