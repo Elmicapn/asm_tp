@@ -1,24 +1,25 @@
-section .data
-
 section .bss
     buffer resb 32
 
 section .text
-
-global _start
+    global _start
 
 _start:
 
     mov rax, [rsp]
     cmp rax, 3
-    jb noarg
+    jne badarg 
 
     mov rsi, [rsp+16]
     call atoi
+    cmp r10, 1
+    je badarg
     mov r8, rax
 
-    mov rsi, [rsp+24]
+    mov rsi, [rsp+24] 
     call atoi
+    cmp r10, 1
+    je badarg
     add r8, rax
 
     mov rax, r8
@@ -35,26 +36,37 @@ _start:
     xor edi, edi
     syscall
 
+badarg:
+    mov eax, 60
+    mov edi, 1
+    syscall
+
 atoi:
     xor rax, rax
     xor r9, r9
+    xor r10, r10
+    
     mov bl, [rsi]
     cmp bl, '-'
-    jne .next
+    jne .parse
     mov r9b, 1
     inc rsi
 
-.next:
+.parse:
     mov bl, [rsi]
     cmp bl, 0
     je .done
     cmp bl, 10
     je .done
+    cmp bl, '0'
+    jb .fail
+    cmp bl, '9'
+    ja .fail
     sub bl, '0'
     imul eax, eax, 10
     add eax, ebx
     inc rsi
-    jmp .next
+    jmp .parse
 
 .done:
     test r9b, r9b
@@ -64,7 +76,11 @@ atoi:
 .ret:
     ret
 
+.fail:
+    mov r10, 1
+    ret
 
+    
 itoa:
     mov rcx, 0
     mov rbx, 10
@@ -96,8 +112,3 @@ itoa:
 .done:
     mov rbx, rdi
     ret
-
-noarg:
-    mov eax, 60
-    mov edi, 1
-    syscall
