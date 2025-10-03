@@ -7,7 +7,7 @@ global _start
 _start:
     mov rax, [rsp]
     cmp rax, 4
-    jb noarg
+    jne noarg
 
     mov rsi, [rsp+16]
     call atoi
@@ -45,6 +45,7 @@ atoi:
     jne .next
     mov r9b, 1
     inc rsi
+    
 .next:
     mov bl, [rsi]
     cmp bl, 0
@@ -56,6 +57,7 @@ atoi:
     add eax, ebx
     inc rsi
     jmp .next
+
 .done:
     test r9b, r9b
     jz .ret
@@ -71,9 +73,11 @@ itoa:
     jns .positive
     neg rax
     mov r9b, 1
+
 .positive:
     lea rdi, [rsi+31]
     mov byte [rdi], 0
+
 .conv:
     xor rdx, rdx
     div rbx

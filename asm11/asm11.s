@@ -1,16 +1,15 @@
 section .bss
-    inbuf   resb 256
+    inbuf   resb 10000
     outbuf  resb 32
 
 section .text
     global _start
 
 _start:
-
-    mov     eax, 0 
+    mov     eax, 0
     mov     edi, 0
     mov     rsi, inbuf
-    mov     edx, 256
+    mov     edx, 10000
     syscall
 
     cmp     rax, 0
@@ -18,7 +17,7 @@ _start:
 
     mov     rcx, rax
     mov     rsi, inbuf
-    xor     rbx, rbx         ; compteur de voyelles
+    xor     rbx, rbx ; compteur de voyelles
 
 .nextchar:
     mov     al, [rsi]
@@ -26,6 +25,8 @@ _start:
     je      .countdone
     cmp     al, 10
     je      .skip
+    cmp     al, 128
+    jae     .skip
 
     cmp     al, 'a'
     je      .isv
@@ -78,10 +79,9 @@ _start:
 itoa:
     mov     rdi, outbuf
     add     rdi, 31
-    mov     byte [rdi], 10   ; '\n'
+    mov     byte [rdi], 10
     mov     rsi, rdi
     mov     rcx, 1
-
     test    rax, rax
     jnz     .loop
     dec     rsi

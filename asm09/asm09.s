@@ -18,11 +18,14 @@ _start:
     cmp     al, '-'
     jne     .default_hex
     cmp     byte [rsi+1], 'b'
-    jne     .default_hex
+    je      .is_bin
+    jmp     invalid
+
+.is_bin:
     cmp     byte [rsi+2], 0
-    jne     .default_hex
+    jne     invalid
     cmp     rdi, 3
-    jl      no_param
+    jne     invalid
     mov     rsi, [rbx+24]
     mov     r9, 2
     jmp     .parse
@@ -32,6 +35,8 @@ _start:
 
 .parse:
     call    atoi
+    cmp     rax, -2
+    je      invalid
     cmp     rax, -1
     je      badinput
     call    itoa_base
@@ -47,6 +52,8 @@ _start:
     syscall
 
 no_param:
+    
+invalid:
     mov     eax, 60
     mov     edi, 1
     syscall
@@ -58,8 +65,21 @@ badinput:
 
 atoi:
     xor     rax, rax
-    
-.next:
+    mov     bl, [rsi]
+    cmp     bl, '-'
+    je      .neg
+    cmp     bl, '+'
+    je      .skip
+    jmp     .loop
+.neg:
+
+    mov     rax, -2
+    ret
+
+.skip:
+    inc     rsi
+
+.loop:
     mov     bl, [rsi]
     cmp     bl, 0
     je      .done
@@ -72,7 +92,7 @@ atoi:
     movzx   r8, bl
     add     rax, r8
     inc     rsi
-    jmp     .next
+    jmp     .loop
 
 .done:
     ret
