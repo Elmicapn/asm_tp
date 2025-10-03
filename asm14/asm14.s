@@ -8,7 +8,8 @@ section .text
 _start:
     mov     rbx, rsp
     mov     rdi, [rbx]
-
+    cmp     rdi, 2
+    jl      no_param
 
     mov     rdi, [rbx+16]
     mov     rax, 2
@@ -30,6 +31,11 @@ _start:
 
     mov     eax, 60
     xor     edi, edi
+    syscall
+
+no_param:
+    mov     eax, 60
+    mov     edi, 1
     syscall
 
 badinput:
