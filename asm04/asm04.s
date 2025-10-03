@@ -1,23 +1,32 @@
-section .data
-
 section .bss
-
-    buf resb 32  
+    buf resb 64
 
 section .text
-
-global _start
+    global _start
 
 _start:
-
     mov eax, 0
-    mov edi, 0 
+    mov edi, 0
     lea rsi, [rel buf]
-    mov edx, 32
+    mov edx, 64
     syscall
 
-    xor rcx, rcx 
+    xor rcx, rcx
     lea rbx, [rel buf]
+    mov r8, 0 
+    mov r9, 0 
+
+    mov al, [rbx]
+    cmp al, '-'
+    jne .check_plus
+    mov r9, 1
+    inc rbx
+    jmp .parse
+
+.check_plus:
+    cmp al, '+'
+    jne .parse
+    inc rbx
 
 .parse:
     mov al, [rbx]
@@ -33,21 +42,29 @@ _start:
     imul rcx, rcx, 10
     add rcx, rax
     inc rbx
+    inc r8
+    cmp r8, 19
+    ja .badinput
     jmp .parse
 
 .done:
+    cmp r9, 0
+    je .check
+    neg rcx
+
+.check:
     test rcx, 1
     jz .even
     jmp .odd
 
 .even:
-    mov eax, 60 
+    mov eax, 60
     xor edi, edi
     syscall
 
 .odd:
     mov eax, 60
-    mov edi, 1 
+    mov edi, 1
     syscall
 
 .badinput:
