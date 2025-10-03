@@ -12,13 +12,15 @@ _start:
     syscall
 
     xor rcx, rcx
+
     lea rbx, [rel buf]
-    mov r8, 0 
-    mov r9, 0 
+    mov r8, 0
+    mov r9, 0
 
     mov al, [rbx]
     cmp al, '-'
     jne .check_plus
+    
     mov r9, 1
     inc rbx
     jmp .parse
@@ -39,8 +41,14 @@ _start:
     cmp al, '9'
     ja .badinput
     sub al, '0'
+
+    mov rax, rcx
+    mov rdx, rcx
     imul rcx, rcx, 10
+    jo .badinput
     add rcx, rax
+    jo .badinput
+
     inc rbx
     inc r8
     cmp r8, 19
@@ -51,6 +59,7 @@ _start:
     cmp r9, 0
     je .check
     neg rcx
+    jo .badinput
 
 .check:
     test rcx, 1
